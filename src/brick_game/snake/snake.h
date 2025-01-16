@@ -20,7 +20,7 @@ struct Point {
 class Snake {
    public:
     Snake();
-    ~Snake();
+    ~Snake() = default;
     void Move(Direction direction);
     void Move();
     void Grow(Point food);
@@ -37,7 +37,7 @@ class Snake {
     Point head_;
 
     Direction direction_;
-    const int max_x_;
-    const int max_y_;
+    const int max_x_ = MAX_X;
+    const int max_y_ = MAX_Y;
 };
 }  // namespace s21

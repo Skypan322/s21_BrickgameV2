@@ -7,11 +7,11 @@
 
 namespace s21 {
 class Field {
+   public:
     enum class CellType { kEmpty, kSnake, kFood };
 
-   public:
     Field();
-    ~Field();
+    ~Field() = default;
     void SpawnFood();
     void EraseFood();
     void EraseSnake();

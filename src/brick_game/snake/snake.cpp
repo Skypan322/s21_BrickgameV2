@@ -6,7 +6,8 @@ Snake::Snake() : direction_(Direction::kRight), max_x_(MAX_X), max_y_(MAX_Y) {
     body_.push_back(Point(max_x_ / 2, max_y_ / 2));
     body_.push_back(Point(max_x_ / 2 - 1, max_y_ / 2));
     body_.push_back(Point(max_x_ / 2 - 2, max_y_ / 2));
-    head_ = body_.back();
+    head_ = body_.front();
+    direction_ = Direction::kUp;
 };
 
 bool Snake::СheckCollision() {
@@ -44,9 +45,9 @@ void Snake::Move() {
         new_head.x++;
     }
 
-    body_.push_back(new_head);
+    body_.push_front(new_head);
     head_ = new_head;
-    body_.pop_front();
+    body_.pop_back();
 }
 
 void Snake::Move(Direction direction) {

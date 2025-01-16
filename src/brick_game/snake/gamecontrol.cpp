@@ -1,19 +1,26 @@
 #include "gamecontrol.h"
 
+#include <iostream>
+
 using namespace s21;
 
-GameControl::GameControl() : field_(std::make_unique<Field>()) {}
+GameControl::GameControl() : field_(std::make_unique<Field>()) {
+    game_state_ = GameState::kStart;
+}
 
 void GameControl::FiniteStateAutomaton(UserInput input) {
     switch (game_state_) {
         case GameState::kStart:
+            std::cout << "Start" << std::endl;
             StartGame();
             break;
         case GameState::kSpawnFood:
+            std::cout << "SpawnFood" << std::endl;
             field_->SpawnFood();
             game_state_ = GameState::kMoving;
             break;
         case GameState::kMoving:
+            std::cout << "Moving" << std::endl;
             if (input != UserInput::kNone) {
                 MoveSnake(static_cast<Direction>(input));
             } else {
@@ -25,6 +32,7 @@ void GameControl::FiniteStateAutomaton(UserInput input) {
             GrowSnake();
             break;
         case GameState::kChecking:
+            std::cout << "Checking" << std::endl;
             if (field_->snake_->СheckCollision()) {
                 game_state_ = GameState::kEnd;
             } else {
@@ -44,6 +52,7 @@ void GameControl::FiniteStateAutomaton(UserInput input) {
             }
             break;
         case GameState::kEnd:
+            std::cout << "End" << std::endl;
             EndGame();
             break;
     }
@@ -59,19 +68,23 @@ void GameControl::StartGame() {
 void GameControl::EndGame() {
     field_->EraseSnake();
     field_->EraseFood();
+    exit(0);
 }
 
 void GameControl::MoveSnake(Direction direction) {
     if (std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - last_move_time_)
-            .count() > 10) {
+            .count() > 1000) {
         field_->EraseSnake();
         field_->snake_->Move(direction);
         field_->DrawSnake();
+        last_move_time_ = std::chrono::steady_clock::now();
     }
 }
 
-void GameControl::MoveSnake() { MoveSnake(field_->snake_->GetDirection()); }
+void GameControl::MoveSnake() {
+    GameControl::MoveSnake(field_->snake_->GetDirection());
+}
 
 void GameControl::TurnSnake(Direction direction) {
     field_->snake_->Turn(direction);

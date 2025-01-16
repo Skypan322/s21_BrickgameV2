@@ -29,6 +29,11 @@ class GameControl {
     void FiniteStateAutomaton(UserInput input);
     void GrowSnake();
     std::chrono::time_point<std::chrono::steady_clock> last_move_time_;
+    std::vector<std::vector<Field::CellType>> GetField() const {
+        return field_->field_;
+    }
+
+    std::deque<Point> GetSnakeBody() const { return field_->snake_->GetBody(); }
 
    private:
     std::unique_ptr<Field> field_;
