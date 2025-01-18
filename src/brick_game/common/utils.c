@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-const char *HIGHSCORE_FILE = "highscore.txt";
-
 int count_digits(int number) {
     return number == 0 ? 1 : (int)log10(number) + 1;
 }
@@ -17,16 +15,16 @@ long time_diff(struct timeval start,
            (end.tv_usec - start.tv_usec) / 1000.0 + 0.5;
 }
 
-void write_highscore(long highscore) {
-    FILE *file = fopen(HIGHSCORE_FILE, "w");
+void write_highscore(const char *highscore_file, long highscore) {
+    FILE *file = fopen(highscore_file, "w");
     fprintf(file, "%ld", highscore);
     fclose(file);
 }
 
-long read_highscore() {
-    FILE *file = fopen(HIGHSCORE_FILE, "r");
+long read_highscore(const char *highscore_file) {
+    FILE *file = fopen(highscore_file, "r");
     if (file == NULL) {
-        write_highscore(0);
+        write_highscore(highscore_file, 0);
         return 0;
     }
     long highscore;

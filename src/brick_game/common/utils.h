@@ -32,14 +32,14 @@ long time_diff(struct timeval start, struct timeval end);
  *
  * @param highscore The highscore to be written.
  */
-void write_highscore(long highscore);
+void write_highscore(const char *highscore_file, long highscore);
 
 /**
  * Reads the highscore from a file.
  *
  * @return The highscore read from the file.
  */
-long read_highscore();
+long read_highscore(const char *highscore_file);
 
 #ifdef __cplusplus
 }

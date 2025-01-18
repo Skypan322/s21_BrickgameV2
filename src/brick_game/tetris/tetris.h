@@ -8,8 +8,8 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../common/utils.h"
 #include "figures.h"
-#include "utils.h"
 
 /**
  * Handles the spawning of a new tetromino in the Tetris game.

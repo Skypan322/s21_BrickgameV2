@@ -35,6 +35,7 @@ class Snake {
    private:
     std::deque<Point> body_;
     Point head_;
+    Point last_tail_;
 
     Direction direction_;
     const int max_x_ = MAX_X;

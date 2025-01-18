@@ -1,5 +1,7 @@
 #include "tetris.h"
 
+#include "figures.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,6 +63,8 @@ void game_tick(Tetris *tetris, UserAction action) {
             break;
         case ATTACHING:
             handle_attach(tetris);
+            tetris->level = tetris->lines / 10;
+            tetris->fall_interval = 2000 / (tetris->level + 1);
             break;
         case GAMEOVER:
             if (tetris->score > tetris->highscore) {

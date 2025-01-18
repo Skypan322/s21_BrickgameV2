@@ -6,40 +6,42 @@ using namespace s21;
 
 GameControl::GameControl() : field_(std::make_unique<Field>()) {
     game_state_ = GameState::kStart;
+    score_ = 1;
+    highscore_ = read_highscore(HIGHSCORE_FILE);
 }
 
 void GameControl::FiniteStateAutomaton(UserInput input) {
     switch (game_state_) {
         case GameState::kStart:
-            std::cout << "Start" << std::endl;
             StartGame();
             break;
         case GameState::kSpawnFood:
-            std::cout << "SpawnFood" << std::endl;
             field_->SpawnFood();
+            game_state_ = GameState::kMoving;
+            FiniteStateAutomaton(input);
+            break;
+        case GameState::kTurning:
+            if (input != UserInput::kNone) {
+                TurnSnake(static_cast<Direction>(input));
+            }
             game_state_ = GameState::kMoving;
             break;
         case GameState::kMoving:
-            std::cout << "Moving" << std::endl;
-            if (input != UserInput::kNone) {
-                MoveSnake(static_cast<Direction>(input));
-            } else {
-                MoveSnake();
-            }
+            MoveSnake();
             game_state_ = GameState::kChecking;
             break;
         case GameState::kGrowing:
             GrowSnake();
+            game_state_ = GameState::kTurning;
             break;
         case GameState::kChecking:
-            std::cout << "Checking" << std::endl;
             if (field_->snake_->СheckCollision()) {
                 game_state_ = GameState::kEnd;
             } else {
                 if (field_->snake_->CheckFood(field_->food_)) {
                     game_state_ = GameState::kGrowing;
                 } else {
-                    game_state_ = GameState::kMoving;
+                    game_state_ = GameState::kTurning;
                 }
             }
             if (input == UserInput::kPause) {
@@ -48,7 +50,7 @@ void GameControl::FiniteStateAutomaton(UserInput input) {
             break;
         case GameState::kPause:
             if (input == UserInput::kPause) {
-                game_state_ = GameState::kMoving;
+                game_state_ = GameState::kTurning;
             }
             break;
         case GameState::kEnd:
@@ -59,22 +61,20 @@ void GameControl::FiniteStateAutomaton(UserInput input) {
 }
 
 void GameControl::StartGame() {
+    field_.reset(new Field());
     game_state_ = GameState::kSpawnFood;
     field_->DrawSnake();
     field_->DrawFood();
     last_move_time_ = std::chrono::steady_clock::now();
 }
 
-void GameControl::EndGame() {
-    field_->EraseSnake();
-    field_->EraseFood();
-    exit(0);
-}
+void GameControl::EndGame() { write_highscore(HIGHSCORE_FILE, highscore_); }
 
 void GameControl::MoveSnake(Direction direction) {
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(
+    if (game_state_ != GameState::kPause &&
+        std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - last_move_time_)
-            .count() > 1000) {
+                .count() > 500) {
         field_->EraseSnake();
         field_->snake_->Move(direction);
         field_->DrawSnake();
@@ -96,4 +96,8 @@ void GameControl::GrowSnake() {
     field_->DrawSnake();
     field_->SpawnFood();
     field_->DrawFood();
+    ++score_;
+    if (score_ > highscore_) {
+        highscore_ = score_;
+    }
 }

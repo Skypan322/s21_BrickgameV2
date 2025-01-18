@@ -1,8 +1,10 @@
 #include "snake.h"
 
+#include <iostream>
+
 using namespace s21;
 
-Snake::Snake() : direction_(Direction::kRight), max_x_(MAX_X), max_y_(MAX_Y) {
+Snake::Snake() : max_x_(MAX_X), max_y_(MAX_Y) {
     body_.push_back(Point(max_x_ / 2, max_y_ / 2));
     body_.push_back(Point(max_x_ / 2 - 1, max_y_ / 2));
     body_.push_back(Point(max_x_ / 2 - 2, max_y_ / 2));
@@ -47,6 +49,7 @@ void Snake::Move() {
 
     body_.push_front(new_head);
     head_ = new_head;
+    last_tail_ = body_.back();
     body_.pop_back();
 }
 
@@ -56,6 +59,6 @@ void Snake::Move(Direction direction) {
 }
 
 void Snake::Grow(Point food) {
-    body_.push_back(food);
-    head_ = food;
+    std::cout << "Food:" << food.x << " " << food.y << std::endl;
+    body_.push_back(last_tail_);
 }

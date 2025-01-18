@@ -17,6 +17,7 @@ constexpr int console_window_h = 21;
 constexpr int console_window_w = 22;
 
 constexpr int console_info_panel_h = 7;
+
 }  // namespace sizes
 
 }  // namespace s21
