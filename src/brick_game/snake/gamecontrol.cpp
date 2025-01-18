@@ -11,6 +11,7 @@ GameControl::GameControl() : field_(std::make_unique<Field>()) {
 }
 
 void GameControl::FiniteStateAutomaton(UserInput input) {
+    std::cout << "Gamestate: " << static_cast<int>(game_state_) << std::endl;
     switch (game_state_) {
         case GameState::kStart:
             StartGame();
@@ -35,6 +36,10 @@ void GameControl::FiniteStateAutomaton(UserInput input) {
             game_state_ = GameState::kTurning;
             break;
         case GameState::kChecking:
+            if (input == UserInput::kPause) {
+                game_state_ = GameState::kPause;
+                break;
+            }
             if (field_->snake_->СheckCollision()) {
                 game_state_ = GameState::kEnd;
             } else {
@@ -44,9 +49,7 @@ void GameControl::FiniteStateAutomaton(UserInput input) {
                     game_state_ = GameState::kTurning;
                 }
             }
-            if (input == UserInput::kPause) {
-                game_state_ = GameState::kPause;
-            }
+
             break;
         case GameState::kPause:
             if (input == UserInput::kPause) {
@@ -92,7 +95,7 @@ void GameControl::TurnSnake(Direction direction) {
 
 void GameControl::GrowSnake() {
     field_->EraseFood();
-    field_->snake_->Grow(field_->food_);
+    field_->snake_->Grow();
     field_->DrawSnake();
     field_->SpawnFood();
     field_->DrawFood();

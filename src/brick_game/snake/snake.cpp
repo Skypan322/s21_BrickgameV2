@@ -58,7 +58,4 @@ void Snake::Move(Direction direction) {
     Move();
 }
 
-void Snake::Grow(Point food) {
-    std::cout << "Food:" << food.x << " " << food.y << std::endl;
-    body_.push_back(last_tail_);
-}
+void Snake::Grow() { body_.push_back(last_tail_); }

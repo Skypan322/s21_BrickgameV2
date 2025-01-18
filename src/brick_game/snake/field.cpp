@@ -41,7 +41,6 @@ void Field::DrawFood() { field_[food_.y][food_.x] = CellType::kFood; };
 void Field::DrawSnake() {
     std::deque<Point> body = snake_->GetBody();
     for (auto it = body.begin(); it != body.end(); ++it) {
-        std::cout << it->x << " " << it->y << std::endl;
         if (it->x < 0 || it->x >= MAX_X || it->y < 0 || it->y >= MAX_Y) {
             break;
         }

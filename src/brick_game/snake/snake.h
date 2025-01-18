@@ -23,7 +23,7 @@ class Snake {
     ~Snake() = default;
     void Move(Direction direction);
     void Move();
-    void Grow(Point food);
+    void Grow();
     void Turn(Direction direction);
     bool СheckCollision();
     bool CheckFood(Point food) const {
