@@ -1,10 +1,8 @@
-
-
 CC = gcc
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Werror -Wextra
-CFLAGS = -std=c11 -Wall -Werror -Wextra
-SRC_BACKEND = $(shell find brick_game/tetris -name 'cli.c')
+CXXFLAGS = -std=c++17 -Wall -Wextra
+CFLAGS = -std=c11 -Wall -Wextra
+SRC_BACKEND = $(shell find brick_game/tetris -name '*.c')
 SRC_BACKEND += $(shell find brick_game/common -name '*.c')
 OBJ_BACKEND = $(SRC_BACKEND:%.c=$(BUILD_DIR)/%.o)
 SRC_FRONTEND = $(shell find gui/cli -name '*.c')
@@ -17,6 +15,8 @@ OBJ_SNAKE_BACKEND = $(SRC_SNAKE_BACKEND:%.cpp=$(BUILD_DIR)/%.o)
 OBJ_SNAKE_BACKEND += $(SRC_SNAKE_BACKEND:%.c=$(BUILD_DIR)/%.o)
 
 SRC_SNAKE = main_snake_cli.cpp $(SRC_SNAKE_BACKEND) $(SRC_FRONTEND)
+TESTS_SRC = $(shell find tests -name '*.cpp')
+TESTS_LIBS = -lgtest
 
 ifeq ($(OS), Darwin)
     OPEN_CMD = xdg-open
@@ -31,9 +31,8 @@ BUILD_DIR = build
 OBJ = $(SRC:%.c=$(BUILD_DIR)/%.o)
 DEP = $(OBJ:.o=.d)
 STYLE_CONFIG = ../materials/linters/.clang-format
-TEST_LIBS = -lcheck -lsubunit -lm
 DESTDIR = .
-BIN = $(DESTDIR)/brick_game
+BIN = $(DESTDIR)/bin
 # OS-specific library flags
 ifeq ($(OS), Darwin)
     LIBS = -lm -lncurses
@@ -42,7 +41,7 @@ else
 endif
 
 # Default target
-all: tetris_cli
+all: desktop tetris_cli snake_cli
 rebuild: clean_all all
 
 # Create the directories for the build outputs
@@ -60,27 +59,34 @@ desktop:
 	@echo "Building desktop..."
 	mkdir -p gui/desktop/build
 	@cd gui/desktop/build && cmake .. && make
-	cp gui/desktop/build/desktop $(BIN)
+	cp gui/desktop/build/desktop .
 
 # Linking the executable
 tetris_cli: $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
 snake_cli: libsnake.a
-	$(CXX) $(CXXFLAGS) $(SRC_FRONTEND) main_snake_cli.cpp libsnake.a -o snake $(LIBS)
+	$(CXX) $(CXXFLAGS) $(SRC_FRONTEND) main_snake_cli.cpp libsnake.a -o snake_cli $(LIBS)
 
 libsnake.a: $(OBJ_SNAKE_BACKEND)
 	ar rcs $@ $^
 
-install: tetris
+install: desktop tetris_cli snake_cli
 	mkdir -p $(BIN)
-	cp tetris $(BIN)
+	cp tetris_cli $(BIN)
+	cp snake_cli $(BIN)
+	cp desktop $(BIN)
+
+test: libsnake.a
+	@echo "Running tests..."
+	$(CXX) $(CXXFLAGS) $(TESTS_SRC) libsnake.a $(TESTS_LIBS) -o test 
+	./test
 
 uninstall:
 	rm -rf $(BIN)
 
-dist: tetris_cli clean
-	cd .. && tar -czf tetris.tar.gz src/tetris
+dist: clean_all
+	cd .. && tar -czf brick_gameV2.tar.gz src/brick_game src/gui src/Makefile
 
 dvi:
 	@echo "Generating documentation..."
@@ -96,12 +102,23 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 clean_target:
-	rm -rf tetris
+	rm -f tetris_cli
+	rm -f snake_cli
+	rm -f desktop
+	rm -rf ../docs
+	rm -rf ../brick_gameV2.tar.gz
+	rm -rf gui/desktop/build
+	rm -rf $(BIN)
 
 clean_all: clean clean_test clean_backend clean_target
 
 clean_backend:
 	rm -f libtetris.a
+	rm -f libsnake.a
+
+clean_test:
+	rm -f test
+
 
 # Debugging the Makefile
 cout: 
@@ -110,9 +127,6 @@ cout:
 	@echo "Snake source files:" $(SRC_SNAKE)
 	@echo "Snake object files:" $(OBJ_SNAKE_BACKEND)
 	
-
-
-
 clang-format:
 	clang-format -style=file:$(STYLE_CONFIG) -i $(SRC) $(TESTS_SRC)
 	clang-format -style=file:$(STYLE_CONFIG) -i $(HEADERS) $(TESTS_H)

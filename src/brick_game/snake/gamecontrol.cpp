@@ -1,13 +1,11 @@
 #include "gamecontrol.h"
 
-#include <iostream>
-
 using namespace s21;
 
 GameControl::GameControl() : field_(std::make_unique<Field>()) {
-  game_state_ = GameState::kStart;
-  score_ = 1;
-  highscore_ = read_highscore(HIGHSCORE_FILE);
+    game_state_ = GameState::kStart;
+    score_ = 1;
+    highscore_ = read_highscore(HIGHSCORE_FILE);
 }
 
 /**
@@ -26,68 +24,68 @@ GameControl::GameControl() : field_(std::make_unique<Field>()) {
  * etc.) to turn the snake.
  */
 void GameControl::FiniteStateAutomaton(UserInput input) {
-  switch (game_state_) {
-    case GameState::kStart:
-      StartGame();
-      break;
-    case GameState::kSpawnFood:
-      field_->SpawnFood();
-      field_->DrawFood();
-      game_state_ = GameState::kTurning;
-      break;
-    case GameState::kTurning:
-      if (input == UserInput::kPause) {
-        game_state_ = GameState::kPause;
-        break;
-      }
-      if (input == UserInput::kQuit) {
-        game_state_ = GameState::kEnd;
-        break;
-      }
-      if (CheckRightInputDirection(input)) {
-        TurnSnake(static_cast<Direction>(input));
-      }
-      if (std::chrono::duration_cast<std::chrono::milliseconds>(
-              std::chrono::steady_clock::now() - last_move_time_)
-              .count() > GetMoveInterval()) {
-        game_state_ = GameState::kMoving;
-      }
-      break;
-    case GameState::kMoving:
-      MoveSnake();
-      game_state_ = GameState::kTurning;
-      if (field_->snake_->СheckCollision()) {
-        game_state_ = GameState::kEnd;
-      } else if (field_->CheckSnakeOnFood()) {
-        game_state_ = GameState::kGrowing;
-      } else {
-        game_state_ = GameState::kTurning;
-      }
-      break;
-    case GameState::kGrowing:
-      GrowSnake();
-      game_state_ = GameState::kSpawnFood;
-      break;
-    case GameState::kPause:
-      if (input == UserInput::kPause) {
-        last_move_time_ = std::chrono::steady_clock::now();
-        game_state_ = GameState::kTurning;
-      }
-      break;
-    case GameState::kEnd:
-      std::cout << "End" << std::endl;
-      EndGame();
-      break;
-  }
+    // Функция довольно длинная, но это единственный способ сохранить все
+    // переходы конечного автомата в ней
+    switch (game_state_) {
+        case GameState::kStart:
+            StartGame();
+            break;
+        case GameState::kSpawnFood:
+            field_->SpawnFood();
+            game_state_ = GameState::kTurning;
+            break;
+        case GameState::kTurning:
+            if (input == UserInput::kPause) {
+                game_state_ = GameState::kPause;
+                break;
+            }
+            if (input == UserInput::kQuit) {
+                game_state_ = GameState::kEnd;
+                break;
+            }
+            if (CheckRightInputDirection(input)) {
+                TurnSnake(static_cast<Direction>(input));
+            }
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - last_move_time_)
+                    .count() > GetMoveInterval()) {
+                game_state_ = GameState::kMoving;
+            }
+            break;
+        case GameState::kMoving:
+            MoveSnake();
+            game_state_ = GameState::kTurning;
+            if (field_->snake_->СheckCollision()) {
+                game_state_ = GameState::kEnd;
+            } else if (field_->CheckSnakeOnFood()) {
+                game_state_ = GameState::kGrowing;
+            } else {
+                game_state_ = GameState::kTurning;
+            }
+            break;
+        case GameState::kGrowing:
+            GrowSnake();
+            game_state_ = GameState::kSpawnFood;
+            break;
+        case GameState::kPause:
+            if (input == UserInput::kPause) {
+                last_move_time_ = std::chrono::steady_clock::now();
+                game_state_ = GameState::kTurning;
+            }
+            break;
+        case GameState::kEnd:
+            EndGame();
+            break;
+    }
 }
 
 void GameControl::StartGame() {
-  field_.reset(new Field());
-  game_state_ = GameState::kTurning;
-  field_->DrawSnake();
-  field_->DrawFood();
-  last_move_time_ = std::chrono::steady_clock::now();
-  highscore_ = read_highscore(HIGHSCORE_FILE);
+    field_.reset(new Field());
+    game_state_ = GameState::kTurning;
+    field_->DrawSnake();
+    field_->DrawFood();
+    last_move_time_ = std::chrono::steady_clock::now();
+    highscore_ = read_highscore(HIGHSCORE_FILE);
 }
 
 void GameControl::EndGame() { write_highscore(HIGHSCORE_FILE, highscore_); }
@@ -102,14 +100,14 @@ void GameControl::EndGame() { write_highscore(HIGHSCORE_FILE, highscore_); }
  * @param direction The direction in which to move the snake.
  */
 void GameControl::MoveSnake(Direction direction) {
-  field_->EraseSnake();
-  field_->snake_->Move(direction);
-  field_->DrawSnake();
-  last_move_time_ = std::chrono::steady_clock::now();
+    field_->EraseSnake();
+    field_->snake_->Move(direction);
+    field_->DrawSnake();
+    last_move_time_ = std::chrono::steady_clock::now();
 }
 
 void GameControl::MoveSnake() {
-  GameControl::MoveSnake(field_->snake_->GetDirection());
+    GameControl::MoveSnake(field_->snake_->GetDirection());
 }
 
 /**
@@ -123,7 +121,7 @@ void GameControl::MoveSnake() {
  * @param direction The direction in which to move the snake.
  */
 void GameControl::TurnSnake(Direction direction) {
-  field_->snake_->Turn(direction);
+    field_->snake_->Turn(direction);
 }
 
 /**
@@ -141,18 +139,18 @@ void GameControl::TurnSnake(Direction direction) {
  * snake. If so, it sets the game state to end the game.
  */
 void GameControl::GrowSnake() {
-  field_->EraseFood();
-  field_->EraseSnake();
-  field_->snake_->Grow();
-  field_->DrawSnake();
-  game_state_ = GameState::kSpawnFood;
-  ++score_;
-  if (score_ > highscore_) {
-    highscore_ = score_;
-  }
-  if (score_ == MAX_X * MAX_Y) {  // score to win
-    game_state_ = GameState::kEnd;
-  }
+    field_->EraseFood();
+    field_->EraseSnake();
+    field_->snake_->Grow();
+    field_->DrawSnake();
+    game_state_ = GameState::kSpawnFood;
+    ++score_;
+    if (score_ > highscore_) {
+        highscore_ = score_;
+    }
+    if (score_ == MAX_X * MAX_Y) {  // score to win
+        game_state_ = GameState::kEnd;
+    }
 }
 
 long GameControl::GetMoveInterval() { return 601 - 3 * score_; }

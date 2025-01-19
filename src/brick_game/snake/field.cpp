@@ -14,14 +14,14 @@ using namespace s21;
  * place food on the field.
  */
 Field::Field() : snake_(std::make_unique<Snake>()) {
-  field_.resize(MAX_Y);
-  for (int i = 0; i < MAX_Y; ++i) {
-    field_[i].resize(MAX_X);
-    for (int j = 0; j < MAX_X; ++j) {
-      field_[i][j] = CellType::kEmpty;
+    field_.resize(MAX_Y);
+    for (int i = 0; i < MAX_Y; ++i) {
+        field_[i].resize(MAX_X);
+        for (int j = 0; j < MAX_X; ++j) {
+            field_[i][j] = CellType::kEmpty;
+        }
     }
-  }
-  SpawnFood();
+    SpawnFood();
 }
 
 /**
@@ -32,14 +32,14 @@ Field::Field() : snake_(std::make_unique<Snake>()) {
  * on a cell that is already occupied by another object.
  */
 void Field::SpawnFood() {
-  int x = rand() % MAX_X;
-  int y = rand() % MAX_Y;
-  while (field_[y][x] != CellType::kEmpty) {
-    x = rand() % MAX_X;
-    y = rand() % MAX_Y;
-  }
-  food_ = Point(x, y);
-  field_[y][x] = CellType::kFood;
+    int x = rand() % MAX_X;
+    int y = rand() % MAX_Y;
+    while (field_[y][x] != CellType::kEmpty) {
+        x = rand() % MAX_X;
+        y = rand() % MAX_Y;
+    }
+    food_ = Point(x, y);
+    field_[y][x] = CellType::kFood;
 }
 /**
  * @brief Erases food.
@@ -54,13 +54,13 @@ void Field::EraseFood() { field_[food_.y][food_.x] = CellType::kEmpty; };
  * out of the field boundaries, the function stops erasing.
  */
 void Field::EraseSnake() {
-  std::deque<Point> body = snake_->GetBody();
-  for (auto it = body.begin(); it != body.end(); ++it) {
-    if (it->x < 0 || it->x >= MAX_X || it->y < 0 || it->y >= MAX_Y) {
-      break;
+    std::deque<Point> body = snake_->GetBody();
+    for (auto it = body.begin(); it != body.end(); ++it) {
+        if (it->x < 0 || it->x >= MAX_X || it->y < 0 || it->y >= MAX_Y) {
+            break;
+        }
+        field_[it->y][it->x] = CellType::kEmpty;
     }
-    field_[it->y][it->x] = CellType::kEmpty;
-  }
 };
 
 /**
@@ -81,13 +81,13 @@ void Field::DrawFood() { field_[food_.y][food_.x] = CellType::kFood; };
  *       stops immediately.
  */
 void Field::DrawSnake() {
-  std::deque<Point> body = snake_->GetBody();
-  for (auto it = body.begin(); it != body.end(); ++it) {
-    if (it->x < 0 || it->x >= MAX_X || it->y < 0 || it->y >= MAX_Y) {
-      break;
+    std::deque<Point> body = snake_->GetBody();
+    for (auto it = body.begin(); it != body.end(); ++it) {
+        if (it->x < 0 || it->x >= MAX_X || it->y < 0 || it->y >= MAX_Y) {
+            break;
+        }
+        field_[it->y][it->x] = CellType::kSnake;
     }
-    field_[it->y][it->x] = CellType::kSnake;
-  }
 };
 
 /**
@@ -99,7 +99,7 @@ void Field::DrawSnake() {
  *
  * @return true if the snake is on the food, false otherwise.
  */
-bool Field::CheckSnakeOnFood() {
-  Point head = snake_->GetSnakeHead();
-  return (head.x == food_.x && head.y == food_.y);
+bool Field::CheckSnakeOnFood() const {
+    Point head = snake_->GetSnakeHead();
+    return (head.x == food_.x && head.y == food_.y);
 }
