@@ -18,6 +18,15 @@ OBJ_SNAKE_BACKEND += $(SRC_SNAKE_BACKEND:%.c=$(BUILD_DIR)/%.o)
 
 SRC_SNAKE = main_snake_cli.cpp $(SRC_SNAKE_BACKEND) $(SRC_FRONTEND)
 
+ifeq ($(OS), Darwin)
+    OPEN_CMD = xdg-open
+else ifeq ($(shell uname -r | grep -i microsoft),)
+	alias chrome="/mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe"
+	OPEN_CMD = chrome
+else
+	OPEN_CMD = xdg-open
+endif
+
 BUILD_DIR = build
 OBJ = $(SRC:%.c=$(BUILD_DIR)/%.o)
 DEP = $(OBJ:.o=.d)
@@ -73,12 +82,12 @@ uninstall:
 dist: tetris_cli clean
 	cd .. && tar -czf tetris.tar.gz src/tetris
 
-dvi: tetris_cli
+dvi:
 	@echo "Generating documentation..."
-	cd .. && rm -rf docs
-	cd .. && mkdir -p docs
-	cd .. && doxygen ACTIVE_TAG_FILES.txt
-	cd .. && $(OPEN_CMD) docs/html/index.html
+	rm -rf ../docs
+	mkdir -p ../docs
+	@doxygen doxygen.cfg
+	@echo "Documentation generated in ../docs"
 
 backend: $(OBJ_BACKEND)
 	ar rcs libtetris.a $^

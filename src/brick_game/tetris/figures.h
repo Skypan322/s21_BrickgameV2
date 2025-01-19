@@ -14,56 +14,56 @@ extern "C" {
 #define FIGURES_COUNT 7
 
 typedef enum Gamestate {
-    START,
-    SPAWN,
-    PAUSE,
-    MOVING,
-    // ROTATING,
-    ATTACHING,
-    GAMEOVER
+  START,
+  SPAWN,
+  PAUSE,
+  MOVING,
+  // ROTATING,
+  ATTACHING,
+  GAMEOVER
 } Gamestate;
 
 typedef enum RotateDirection { LEFT, RIGHT } RotateDirection;
 
 typedef enum UserAction {
-    ROTATE_LEFT,
-    ROTATE_RIGHT,
-    MOVE_RIGHT,
-    MOVE_LEFT,
-    MOVE_DOWN,
-    MOVE_HARD_DOWN,
-    PAUSE_ACTION,
-    EXIT_ACTION,
-    NONE
+  ROTATE_LEFT,
+  ROTATE_RIGHT,
+  MOVE_RIGHT,
+  MOVE_LEFT,
+  MOVE_DOWN,
+  MOVE_HARD_DOWN,
+  PAUSE_ACTION,
+  EXIT_ACTION,
+  NONE
 } UserAction;
 
 typedef enum FigureType { O, I, S, Z, L, J, T } FigureType;
 
 typedef struct Brick {
-    int x;
-    int y;
+  int x;
+  int y;
 } Brick;
 
 typedef struct Figure {
-    int x;  // x coordinate of the left top corner
-    int y;  // y coordinate of the left top corner
-    int rotation;
-    Brick rotation_center;
-    FigureType type;
-    Brick bricks[4];
+  int x;  // x coordinate of the left top corner
+  int y;  // y coordinate of the left top corner
+  int rotation;
+  Brick rotation_center;
+  FigureType type;
+  Brick bricks[4];
 } Figure;
 
 typedef struct Tetris {
-    int field[20][10];
-    Figure *figure;
-    Figure *next;
-    Gamestate state;
-    struct timeval last_fall;
-    long highscore;
-    long fall_interval;
-    int score;
-    int level;
-    int lines;  // number of lines cleared
+  int field[20][10];
+  Figure *figure;
+  Figure *next;
+  Gamestate state;
+  struct timeval last_fall;
+  long highscore;
+  long fall_interval;
+  int score;
+  int level;
+  int lines;  // number of lines cleared
 } Tetris;
 
 /**
