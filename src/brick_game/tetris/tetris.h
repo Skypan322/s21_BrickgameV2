@@ -11,6 +11,8 @@ extern "C" {
 #include "../common/utils.h"
 #include "figures.h"
 
+static const char *TETRIS_HIGHSCORE_FILE = "highscore_tetris.txt";
+
 /**
  * Handles the spawning of a new tetromino in the Tetris game.
  *

@@ -12,6 +12,7 @@ Field::Field() : snake_(std::make_unique<Snake>()) {
             field_[i][j] = CellType::kEmpty;
         }
     }
+    SpawnFood();
 }
 
 void Field::SpawnFood() {
@@ -47,3 +48,8 @@ void Field::DrawSnake() {
         field_[it->y][it->x] = CellType::kSnake;
     }
 };
+
+bool Field::CheckSnakeOnFood() {
+    Point head = snake_->GetSnakeHead();
+    return (head.x == food_.x && head.y == food_.y);
+}

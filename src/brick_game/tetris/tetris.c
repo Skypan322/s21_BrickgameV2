@@ -63,7 +63,7 @@ void game_tick(Tetris *tetris, UserAction action) {
             break;
         case ATTACHING:
             handle_attach(tetris);
-            tetris->level = tetris->lines / 10;
+            tetris->level = tetris->lines / 3;
             tetris->fall_interval = 2000 / (tetris->level + 1);
             break;
         case GAMEOVER:

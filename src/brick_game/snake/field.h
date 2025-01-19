@@ -17,6 +17,7 @@ class Field {
     void EraseSnake();
     void DrawSnake();
     void DrawFood();
+    bool CheckSnakeOnFood();
 
    private:
     std::vector<std::vector<CellType>>

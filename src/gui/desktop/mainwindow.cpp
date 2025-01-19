@@ -34,7 +34,8 @@ void MainWindow::initGame() {
     ui->stackedWidget->setCurrentIndex(static_cast<int>(cur_widget_));
     if (current_game_type_ == GameType::kTetris) {
         last_tetris_action_ = NONE;
-        tetris_init(&tetris_, 1, 0);
+        this->tetris_ = {};
+        tetris_init(&tetris_, 1, read_highscore(TETRIS_HIGHSCORE_FILE));
         game_tick(&tetris_, NONE);
     } else if (current_game_type_ == GameType::kSnake) {
         last_user_input_ = s21::UserInput::kNone;
@@ -103,6 +104,8 @@ void MainWindow::updateGame() {
             last_user_input_ = input_queue_.dequeue();
         }
         snake_game_.FiniteStateAutomaton(last_user_input_);
+        last_user_input_ = s21::UserInput::kNone;
+        ui->level->setText(QString::number(snake_game_.GetMoveInterval()));
         ui->score->setText(QString::number(snake_game_.GetScore()));
         ui->bestScore->setText(QString::number(snake_game_.GetHighScore()));
         if (snake_game_.GetGameState() == s21::GameControl::GameState::kEnd) {
@@ -114,6 +117,9 @@ void MainWindow::updateGame() {
             last_tetris_action_ = tetris_input_queue_.dequeue();
         }
         game_tick(&tetris_, last_tetris_action_);
+        ui->score->setText(QString::number(tetris_.score));
+        ui->bestScore->setText(QString::number(tetris_.highscore));
+        ui->level->setText(QString::number(tetris_.level));
         last_tetris_action_ = NONE;
         if (tetris_.state == GAMEOVER) {
             HandleTetrisGameover();
@@ -128,7 +134,9 @@ void MainWindow::HandleTetrisGameover() {
     ui->stackedWidget->setCurrentIndex(static_cast<int>(cur_widget_));
     ui->gm_best_score->setText(QString::number(tetris_.highscore));
     ui->gm_score->setText(QString::number(tetris_.score));
-    write_highscore("../../higscore_tetris.txt", tetris_.highscore);
+    write_highscore(TETRIS_HIGHSCORE_FILE, tetris_.highscore);
+
+    last_game_type_ = GameType::kTetris;
 }
 
 void MainWindow::HandleSnakeGameover() {

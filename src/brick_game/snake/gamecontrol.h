@@ -15,7 +15,6 @@ class GameControl {
         kSpawnFood,
         kMoving,
         kGrowing,
-        kChecking,
         kTurning,
         kPause,
         kEnd
@@ -38,6 +37,11 @@ class GameControl {
     long GetHighScore() const { return highscore_; }
     GameState GetGameState() const { return game_state_; }
     const char* GetHighScoreFile() const { return HIGHSCORE_FILE; }
+    bool CheckRightInputDirection(UserInput input) {
+        return ((input == UserInput::kUp) || (input == UserInput::kDown) ||
+                (input == UserInput::kLeft) || (input == UserInput::kRight));
+    }
+    long GetMoveInterval();
 
     std::deque<Point> GetSnakeBody() const { return field_->snake_->GetBody(); }
 

@@ -29,6 +29,7 @@ class Snake {
     bool CheckFood(Point food) const {
         return head_.x == food.x && head_.y == food.y;
     }
+    Point GetSnakeHead() { return head_; }
     std::deque<Point> GetBody() const { return body_; }
     Direction GetDirection() const { return direction_; }
 
